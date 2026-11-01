@@ -2,6 +2,7 @@ payload:
 - PROCESS-NAME,Vrchat.exe
 - PROCESS-NAME,com.vrchat.oculus.quest
 - PROCESS-NAME,com.vrchat.mobile.playstore
+- PROCESS-NAME,VRCVideoCacher.exe
 - DOMAIN-SUFFIX,s3.amazonaws.com
 - DOMAIN-SUFFIX,ns.exitgames.com
 - DOMAIN-SUFFIX,api.fynn.ai

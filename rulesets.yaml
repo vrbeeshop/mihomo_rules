@@ -163,6 +163,10 @@ sources:
     behavior: classical
     format: yaml
     path: rules/vrbee_vrchat.yaml
+  vrbee_direct:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_direct.yaml
 rulesets:
   vrbee_proxy:
     behavior: domain
@@ -272,3 +276,7 @@ rulesets:
     behavior: classical
     sources:
     - vrbee_vrchat
+  vrbee_direct:
+    behavior: classical
+    sources:
+    - vrbee_direct

@@ -1,0 +1,4 @@
+payload:
+- PROCESS-NAME,adb.exe
+- PROCESS-NAME,Warframe.x64.exe
+- PROCESS-NAME,WinSCP.exe
