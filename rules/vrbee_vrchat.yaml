@@ -1,0 +1,23 @@
+payload:
+- PROCESS-NAME,Vrchat.exe
+- PROCESS-NAME,com.vrchat.oculus.quest
+- PROCESS-NAME,com.vrchat.mobile.playstore
+- DOMAIN-SUFFIX,s3.amazonaws.com
+- DOMAIN-SUFFIX,ns.exitgames.com
+- DOMAIN-SUFFIX,api.fynn.ai
+- DOMAIN-SUFFIX,api-dev.fynn.ai
+- DOMAIN-SUFFIX,vket.chat
+- DOMAIN-SUFFIX,v-market.work
+- DOMAIN-SUFFIX,xr-marketplace.com
+- DOMAIN-SUFFIX,avatarsearch.cc
+- DOMAIN-SUFFIX,just-h.party
+- DOMAIN-SUFFIX,api.lab.amplitude.com
+- DOMAIN-SUFFIX,api.amplitude.com
+- DOMAIN-SUFFIX,api2.amplitude.com
+- DOMAIN-SUFFIX,ns.photonengine.io
+- DOMAIN-SUFFIX,vrchat.cloud
+- DOMAIN-SUFFIX,api.epicgames.dev
+- DOMAIN-SUFFIX,datarouter.ol.epicgames.com
+- DOMAIN-SUFFIX,cloud.unity3d.com
+- DOMAIN-SUFFIX,on.epicgames.com
+- DOMAIN-SUFFIX,vrc.tl

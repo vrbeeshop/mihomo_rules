@@ -1,0 +1,5 @@
+payload:
+- PROCESS-NAME,Beat Saber.exe
+- PROCESS-NAME,NalulunaModAssistant.exe
+- DOMAIN-SUFFIX,cloudfront.net
+- DOMAIN-SUFFIX,beatsaver.com

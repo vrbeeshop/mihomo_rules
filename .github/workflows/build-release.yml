@@ -1,0 +1,134 @@
+name: Build and release rulesets
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # 06:17 Europe/Moscow; GitHub schedules are best effort.
+    - cron: '17 3 * * *'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    outputs:
+      artifact-id: ${{ steps.artifact.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install Python dependencies
+        run: python3 -m pip install -r requirements.txt
+      - name: Install verified Mihomo
+        run: python3 scripts/install_mihomo.py
+      - name: Test builder
+        env:
+          MIHOMO_BIN: .work/bin/mihomo
+        run: python3 -m unittest discover -s tests -v
+      - name: Fetch, merge, and verify rulesets
+        run: python3 scripts/build.py --mihomo .work/bin/mihomo
+      - name: Upload public build output
+        id: artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rulesets-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 7
+
+  publish:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    # A slow upstream must not cancel a running daily build or publication.
+    concurrency:
+      group: publish-rulesets
+      cancel-in-progress: false
+    steps:
+      - name: Download this build's verified artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+          path: dist/
+          merge-multiple: true
+          digest-mismatch: error
+      - name: Verify release files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          directory = Path('dist')
+          required = {'manifest.json', 'checksums.sha256', 'release-notes.md', 'providers.yaml'}
+          files = list(directory.iterdir())
+          assert required <= {path.name for path in files}, 'Missing required release files'
+          for path in files:
+              assert path.is_file() and not path.is_symlink(), f'Unexpected release entry: {path}'
+              assert path.name in required or path.suffix in {'.mrs', '.yaml', '.list'}, f'Unexpected release file: {path}'
+          for suffix in ('.mrs', '.yaml', '.list'):
+              assert any(path.suffix == suffix for path in files), f'No {suffix} files built'
+          PY
+          cd dist
+          sha256sum --check --strict checksums.sha256
+      - name: Publish complete release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RULESET_RUN_NUMBER: ${{ github.run_number }}
+          RULESET_RUN_ATTEMPT: ${{ github.run_attempt }}
+          RULESET_COMMIT: ${{ github.sha }}
+        run: |
+          # Job concurrency is not FIFO: prevent a slower, older run becoming latest.
+          gh release list --limit 100 --exclude-drafts --exclude-pre-releases --json tagName > releases.json
+          publication_allowed=$(python3 - <<'PY'
+          import json, os, re
+          current = (int(os.environ['RULESET_RUN_NUMBER']), int(os.environ['RULESET_RUN_ATTEMPT']))
+          pattern = re.compile(r'^daily-\d{4}-\d{2}-\d{2}-r(\d+)-a(\d+)$')
+          newer_published = False
+          for release in json.load(open('releases.json')):
+              match = pattern.fullmatch(release['tagName'])
+              if match and tuple(map(int, match.groups())) >= current:
+                  newer_published = True
+          print('false' if newer_published else 'true')
+          PY
+          )
+          if [[ "$publication_allowed" == false ]]; then
+            echo 'A release from this or a newer run is already published; skipping.'
+            exit 0
+          fi
+          release_date=$(date --utc +%F)
+          release_tag="daily-${release_date}-r${RULESET_RUN_NUMBER}-a${RULESET_RUN_ATTEMPT}"
+          gh release create "$release_tag" \
+            --draft \
+            --target "$RULESET_COMMIT" \
+            --title "Rulesets ${release_date} (run ${RULESET_RUN_NUMBER}.${RULESET_RUN_ATTEMPT})" \
+            --notes-file dist/release-notes.md
+          gh release upload "$release_tag" dist/*
+          gh release view "$release_tag" --json assets > release-assets.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          local = {path.name: path.stat().st_size for path in Path('dist').iterdir()}
+          remote = {asset['name']: asset['size'] for asset in json.load(open('release-assets.json'))['assets']}
+          assert local == remote, 'Uploaded release assets do not match this build'
+          PY
+          # Only this final operation updates releases/latest/download/<filename>.
+          # Any failure above leaves a draft and preserves the previous public release.
+          gh release edit "$release_tag" --draft=false --latest
+          gh release view "$release_tag" --json url --jq .url >> "$GITHUB_STEP_SUMMARY"

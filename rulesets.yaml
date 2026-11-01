@@ -1,0 +1,274 @@
+version: 1
+repository: vrbeeshop/mihomo_rules
+sources:
+  ai:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs
+  category-porn:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-porn.mrs
+  cloudflare-domains:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cloudflare.mrs
+  cloudflare-ips:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cloudflare.mrs
+  cloudfront-ips:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cloudfront.mrs
+  discord_domains:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/discord.mrs
+  discord_voiceips:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/other/discord-voice-ip-list.mrs
+  drweb:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/drweb.mrs
+  games-direct:
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/other/games-direct.yaml
+  geoip-by:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/by.mrs
+  geoip-private:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs
+  geoip-ru:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/ru.mrs
+  geosite-private:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs
+  geosite-ru:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ru.mrs
+  google-deepmind:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-deepmind.mrs
+  google-play:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-play.mrs
+  mailru:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/mailru.mrs
+  meta:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/meta.mrs
+  oisd_big:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/oisd/big.mrs
+  refilter_domains:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/re-filter/domain-rule.mrs
+  ru-apps:
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/other/ru-app-list.yaml
+  ru-inside:
+    behavior: classical
+    format: text
+    url: https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Russia/inside-clashx.lst
+    exclude_rules:
+    - DOMAIN-SUFFIX,.ua
+  ru-outside:
+    behavior: classical
+    format: text
+    url: https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Russia/outside-clashx.lst
+  rutracker:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/rutracker.mrs
+  soundcloud:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/soundcloud.mrs
+  speedtest-net:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/speedtest.mrs
+  telegram-domains:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs
+  telegram-ips:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs
+  torrent-clients:
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/other/torrent-clients.yaml
+  torrent-trackers:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/other/torrent-trackers.mrs
+  yandex:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/yandex.mrs
+  youtube:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs
+  vrbee_proxy_domains:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_proxy.yaml
+    partition: domain
+  vrbee_proxy_extra:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_proxy.yaml
+    partition: remainder
+  vrbee_ru_domains:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_ru.yaml
+    partition: domain
+  vrbee_ru_extra:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_ru.yaml
+    partition: remainder
+  vrbee_messengers:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_messengers.yaml
+  vrbee_bs:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_bs.yaml
+  vrbee_vrchat:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_vrchat.yaml
+rulesets:
+  vrbee_proxy:
+    behavior: domain
+    sources:
+    - ru-inside
+    - refilter_domains
+    - category-porn
+    - ai
+    - google-deepmind
+    - speedtest-net
+    - meta
+    - rutracker
+    - google-play
+    - soundcloud
+    - vrbee_proxy_domains
+  vrbee_proxy_extra:
+    behavior: classical
+    sources:
+    - vrbee_proxy_extra
+  vrbee_ru:
+    behavior: domain
+    sources:
+    - ru-outside
+    - yandex
+    - mailru
+    - drweb
+    - geosite-ru
+    - vrbee_ru_domains
+  vrbee_ru_extra:
+    behavior: classical
+    sources:
+    - vrbee_ru_extra
+    - ru-apps
+    exclude_covered_by:
+    - vrbee_ru
+  vrbee_ru_ips:
+    behavior: ipcidr
+    sources:
+    - geoip-ru
+    - geoip-by
+  cdn-domains:
+    behavior: domain
+    sources:
+    - cloudflare-domains
+  cdn-ips:
+    behavior: ipcidr
+    sources:
+    - cloudflare-ips
+    - cloudfront-ips
+  cloudflare-ips:
+    behavior: ipcidr
+    sources:
+    - cloudflare-ips
+  discord_domains:
+    behavior: domain
+    sources:
+    - discord_domains
+  discord_voiceips:
+    behavior: ipcidr
+    sources:
+    - discord_voiceips
+  games-direct:
+    behavior: classical
+    sources:
+    - games-direct
+  geoip-private:
+    behavior: ipcidr
+    sources:
+    - geoip-private
+  geosite-private:
+    behavior: domain
+    sources:
+    - geosite-private
+  oisd_big:
+    behavior: domain
+    sources:
+    - oisd_big
+  telegram-domains:
+    behavior: domain
+    sources:
+    - telegram-domains
+  telegram-ips:
+    behavior: ipcidr
+    sources:
+    - telegram-ips
+  torrent-clients:
+    behavior: classical
+    sources:
+    - torrent-clients
+  torrent-trackers:
+    behavior: domain
+    sources:
+    - torrent-trackers
+  youtube:
+    behavior: domain
+    sources:
+    - youtube
+  vrbee_messengers:
+    behavior: classical
+    sources:
+    - vrbee_messengers
+  vrbee_bs:
+    behavior: classical
+    sources:
+    - vrbee_bs
+  vrbee_vrchat:
+    behavior: classical
+    sources:
+    - vrbee_vrchat
