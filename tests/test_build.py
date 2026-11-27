@@ -125,6 +125,17 @@ class ParsingTests(unittest.TestCase):
         path.write_text(yaml.safe_dump(expected), encoding="utf-8")
         self.assertEqual(builder.load_manifest(path), expected)
 
+    def test_classical_export_preserves_domain_scope_and_ip_networks(self):
+        for rule, source, expected in (
+            ("exact.example", "domain", "DOMAIN,exact.example"),
+            ("+.suffix.example", "domain", "DOMAIN-SUFFIX,suffix.example"),
+            ("2001:db8::1/64", "ipcidr", "IP-CIDR,2001:db8::/64"),
+        ):
+            self.assertEqual(builder.normalize_rule(rule, source, "classical"), expected)
+        for pattern in (".example", "*.example", "*"):
+            with self.assertRaises(builder.BuildError):
+                builder.normalize_rule(pattern, "domain", "classical")
+
     def test_manifest_accepts_local_sources_and_exact_exclusions_without_rewriting(self):
         manifest = fixture_manifest()
         manifest["sources"]["domains"] = {
@@ -216,10 +227,12 @@ class ParsingTests(unittest.TestCase):
             value = fixture_manifest()
             value["rulesets"]["combined"]["sources"] = sources
             cases.append(value)
-        for behavior in ("ipcidr", "classical"):
-            value = fixture_manifest()
-            value["rulesets"]["combined"]["behavior"] = behavior
-            cases.append(value)
+        value = fixture_manifest()
+        value["rulesets"]["combined"]["behavior"] = "ipcidr"
+        cases.append(value)
+        value = fixture_manifest()
+        value["rulesets"]["networks"]["behavior"] = "domain"
+        cases.append(value)
         for field, value in (("format", "csv"), ("url", "http://example.com/rules"), ("behavior", "unknown")):
             manifest = fixture_manifest()
             manifest["sources"]["domains"][field] = value
@@ -486,6 +499,14 @@ class NativeBuildTests(unittest.TestCase):
         with self.assertRaises(builder.BuildError):
             self.build()
         self.assertEqual(self.snapshot(), previous)
+
+    def test_standalone_build_rejects_nested_global_geodata_before_native_validation(self):
+        self.manifest["allow_global_geodata"] = False
+        self.fixtures["https://example.com/other"] = b"payload: ['NOT,((GEOSITE,example))']\n"
+        with patch.object(builder, "validate_providers") as validate:
+            with self.assertRaisesRegex(builder.BuildError, "other requires global geodata: GeoSite.dat"):
+                self.build()
+        validate.assert_not_called()
 
     def test_native_warning_about_invalid_domain_rejects_entire_build(self):
         self.build()

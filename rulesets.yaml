@@ -1,5 +1,6 @@
 version: 1
 repository: vrbeeshop/mihomo_rules
+allow_global_geodata: false
 sources:
   ai:
     behavior: domain
@@ -141,6 +142,11 @@ sources:
     format: yaml
     path: rules/vrbee_proxy.yaml
     partition: remainder
+  vrbee_proxy_keywords:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_proxy.yaml
+    partition: domain-keyword
   vrbee_ru_domains:
     behavior: classical
     format: yaml
@@ -151,6 +157,11 @@ sources:
     format: yaml
     path: rules/vrbee_ru.yaml
     partition: remainder
+  vrbee_ru_keywords:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_ru.yaml
+    partition: domain-keyword
   vrbee_messengers:
     behavior: classical
     format: yaml
@@ -167,6 +178,80 @@ sources:
     behavior: classical
     format: yaml
     path: rules/vrbee_direct.yaml
+  geosite-tmdb:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tmdb.mrs
+  geosite-linkedin:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/linkedin.mrs
+  geosite-spotify:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs
+  geosite-x:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs
+  geosite-adguard:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/adguard.mrs
+  geosite-autodesk:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/autodesk.mrs
+  geosite-whatsapp:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/whatsapp.mrs
+  asn-32934-ipv4:
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/ipverse/as-ip-blocks/master/as/32934/ipv4-aggregated.txt
+  asn-32934-ipv6:
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/ipverse/as-ip-blocks/master/as/32934/ipv6-aggregated.txt
+  asn-16509-ipv4:
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/ipverse/as-ip-blocks/master/as/16509/ipv4-aggregated.txt
+  asn-16509-ipv6:
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/ipverse/as-ip-blocks/master/as/16509/ipv6-aggregated.txt
+  asn-16276-ipv4:
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/ipverse/as-ip-blocks/master/as/16276/ipv4-aggregated.txt
+  asn-16276-ipv6:
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/ipverse/as-ip-blocks/master/as/16276/ipv6-aggregated.txt
+  vrbee_proxy_process:
+    behavior: classical
+    format: text
+    path: rules/vrbee_proxy_process.list
+  vrbee_proxy_ips:
+    behavior: ipcidr
+    format: text
+    path: rules/vrbee_proxy_ips.list
+  whatsapp-static-ips:
+    behavior: ipcidr
+    format: text
+    path: rules/whatsapp-static-ips.list
+  messenger-domains:
+    behavior: classical
+    format: yaml
+    path: rules/vrbee_messengers.yaml
+    partition: domain
+  games-domains:
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/other/games-direct.yaml
+    partition: domain
 rulesets:
   vrbee_proxy:
     behavior: domain
@@ -186,6 +271,13 @@ rulesets:
     behavior: classical
     sources:
     - vrbee_proxy_extra
+    - geosite-tmdb
+    - geosite-linkedin
+    - geosite-spotify
+    - geosite-x
+    - geosite-adguard
+    - vrbee_proxy_process
+    - vrbee_proxy_ips
   vrbee_ru:
     behavior: domain
     sources:
@@ -268,6 +360,10 @@ rulesets:
     behavior: classical
     sources:
     - vrbee_messengers
+    - geosite-whatsapp
+    - whatsapp-static-ips
+    - asn-32934-ipv4
+    - asn-32934-ipv6
   vrbee_bs:
     behavior: classical
     sources:
@@ -280,3 +376,93 @@ rulesets:
     behavior: classical
     sources:
     - vrbee_direct
+  geosite-tmdb:
+    behavior: domain
+    sources:
+    - geosite-tmdb
+  geosite-linkedin:
+    behavior: domain
+    sources:
+    - geosite-linkedin
+  geosite-spotify:
+    behavior: domain
+    sources:
+    - geosite-spotify
+  geosite-x:
+    behavior: domain
+    sources:
+    - geosite-x
+  geosite-adguard:
+    behavior: domain
+    sources:
+    - geosite-adguard
+  geosite-autodesk:
+    behavior: domain
+    sources:
+    - geosite-autodesk
+  geosite-whatsapp:
+    behavior: domain
+    sources:
+    - geosite-whatsapp
+  asn-16509:
+    behavior: ipcidr
+    sources:
+    - asn-16509-ipv4
+    - asn-16509-ipv6
+  asn-16276:
+    behavior: ipcidr
+    sources:
+    - asn-16276-ipv4
+    - asn-16276-ipv6
+  vrbee_proxy_ips:
+    behavior: ipcidr
+    sources:
+    - vrbee_proxy_ips
+  vrbee_proxy_keywords:
+    behavior: classical
+    sources:
+    - vrbee_proxy_keywords
+  vrbee_ru_keywords:
+    behavior: classical
+    sources:
+    - vrbee_ru_keywords
+  whatsapp-ips:
+    behavior: ipcidr
+    sources:
+    - whatsapp-static-ips
+    - asn-32934-ipv4
+    - asn-32934-ipv6
+  messenger-domains:
+    behavior: domain
+    sources:
+    - messenger-domains
+    exclude_covered_by:
+    - geosite-whatsapp
+  games-domains:
+    behavior: domain
+    sources:
+    - games-domains
+  ru-apps:
+    behavior: classical
+    sources:
+    - ru-apps
+  panel-proxy:
+    behavior: domain
+    sources:
+    - ru-inside
+    - refilter_domains
+    - category-porn
+    - ai
+    - google-deepmind
+    - speedtest-net
+    - meta
+    - rutracker
+    - google-play
+  soundcloud:
+    behavior: domain
+    sources:
+    - soundcloud
+  cloudfront-ips:
+    behavior: ipcidr
+    sources:
+    - cloudfront-ips

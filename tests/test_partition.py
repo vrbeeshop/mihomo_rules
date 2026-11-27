@@ -54,6 +54,11 @@ class PartitionTests(unittest.TestCase):
         with self.assertRaises(builder.BuildError):
             builder.partition_rules(["DOMAIN,example.org"], "unknown")
 
+    def test_keyword_provider_omits_process_and_address_rules(self):
+        rules = ["DOMAIN-KEYWORD,first", "PROCESS-NAME,example.exe", "DOMAIN,example.org",
+                 "IP-CIDR,192.0.2.1/32", "DOMAIN-KEYWORD,second"]
+        self.assertEqual(builder.partition_rules(rules, "domain-keyword"), [rules[0], rules[-1]])
+
     def test_both_partitions_can_read_one_source(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "manifest.yaml"

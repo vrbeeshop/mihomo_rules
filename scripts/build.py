@@ -25,6 +25,9 @@ class BuildError(ValueError):
     pass
 
 
+CLASSICAL_PARTITIONS = ("domain", "remainder", "domain-keyword")
+
+
 def local_source_path(source: dict, source_root: Path) -> Path:
     """Resolve local sources within the rules/ directory."""
     value = source.get("path")
@@ -47,6 +50,8 @@ def load_manifest(path: Path) -> dict:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or data.get("version") != 1:
         raise BuildError("Expected manifest version: 1")
+    if not isinstance(data.get("allow_global_geodata", True), bool):
+        raise BuildError("allow_global_geodata must be a boolean")
     if not re.fullmatch(r"[\w.-]+/[\w.-]+", data.get("repository", "")):
         raise BuildError("repository must be owner/repo")
     for section in ("sources", "rulesets"):
@@ -62,9 +67,9 @@ def load_manifest(path: Path) -> dict:
             raise BuildError(f"Invalid format for {name}")
         if source["format"] == "mrs" and source["behavior"] == "classical":
             raise BuildError(f"MRS cannot contain classical rules: {name}")
-        if "partition" in source and (source["partition"] not in ("domain", "remainder")
+        if "partition" in source and (source["partition"] not in CLASSICAL_PARTITIONS
                                       or source["behavior"] != "classical"):
-            raise BuildError(f"Expected a domain or remainder partition of classical rules: {name}")
+            raise BuildError(f"Invalid classical source partition for {name}")
         if ("url" in source) == ("path" in source):
             raise BuildError(f"Expected exactly one of url or path for {name}")
         if "path" in source:
@@ -85,7 +90,8 @@ def load_manifest(path: Path) -> dict:
             if source_id not in data["sources"]:
                 raise BuildError(f"Unknown source {source_id} in {name}")
             behavior = data["sources"][source_id]["behavior"]
-            if behavior != group["behavior"] and (behavior, group["behavior"]) != ("classical", "domain"):
+            target = group["behavior"]
+            if target not in (behavior, "classical") and (behavior, target) != ("classical", "domain"):
                 raise BuildError(f"Incompatible behaviors for {name}: {source_id}")
     ruleset_order(data["rulesets"])
     return data
@@ -268,6 +274,18 @@ def read_rules(path: Path, format_: str) -> list[str]:
 
 
 def normalize_rule(rule: str, source_behavior: str, target_behavior: str) -> str:
+    # Older profiles consume combined classical providers. Expand the same
+    # source data there while newer profiles can load the individual MRS files.
+    if target_behavior == "classical" and source_behavior == "domain":
+        pattern = domain_pattern(rule, "domain")
+        if not pattern or pattern[0] not in ("exact", "suffix"):
+            raise BuildError(f"Cannot losslessly convert domain pattern to classical: {rule}")
+        kind, domain = pattern
+        prefix = "DOMAIN" if kind == "exact" else "DOMAIN-SUFFIX"
+        return f"{prefix},{domain}"
+    if target_behavior == "classical" and source_behavior == "ipcidr":
+        network = normalize_rule(rule, "ipcidr", "ipcidr")
+        return f"IP-CIDR,{network}"
     if source_behavior == "classical" and target_behavior == "domain":
         parts = [part.strip() for part in rule.split(",")]
         if len(parts) != 2 or parts[0] not in ("DOMAIN", "DOMAIN-SUFFIX"):
@@ -295,8 +313,10 @@ def normalize_rule(rule: str, source_behavior: str, target_behavior: str) -> str
 
 def partition_rules(rules: list[str], partition: str) -> list[str]:
     """Split one classical source by exact domain-format representability."""
-    if partition not in ("domain", "remainder"):
+    if partition not in CLASSICAL_PARTITIONS:
         raise BuildError(f"Unknown source partition: {partition!r}")
+    if partition == "domain-keyword":
+        return [rule for rule in rules if rule.partition(",")[0].strip() == "DOMAIN-KEYWORD"]
     result = []
     for rule in rules:
         try:
@@ -495,6 +515,11 @@ def build(manifest: dict, binary: Path, output: Path, work: Path, offline: bool 
             group = manifest["rulesets"][name]
             combined = [normalize_rule(rule, manifest["sources"][source_id]["behavior"], group["behavior"])
                         for source_id in group["sources"] for rule in source_rules[source_id]]
+            if group["behavior"] == "classical" and not manifest.get("allow_global_geodata", True):
+                dependencies = required_geodata(combined)
+                if dependencies:
+                    raise BuildError(f"{name} requires global geodata: {', '.join(sorted(dependencies))}; "
+                                     "use dedicated domain or ipcidr sources")
             unique = list(dict.fromkeys(combined))
             if group["behavior"] != "classical":
                 unique.sort()

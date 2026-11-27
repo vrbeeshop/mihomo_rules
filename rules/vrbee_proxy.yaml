@@ -57,11 +57,6 @@ payload:
   - DOMAIN-SUFFIX,bambuddy.cool
   - DOMAIN-SUFFIX,tortoisegit.org
   - DOMAIN-SUFFIX,gitlab.com
-  - GEOSITE,tmdb
-  - GEOSITE,linkedin
-  - GEOSITE,spotify
-  - GEOSITE,x
-  - GEOSITE,adguard
   - DOMAIN-SUFFIX,tanggle.io
   - DOMAIN,is.xivup.com
   - DOMAIN,kamori.goats.dev
@@ -116,7 +111,6 @@ payload:
   - DOMAIN-SUFFIX,geneticlifehacks.com
   - DOMAIN-SUFFIX,nist.gov
   - DOMAIN-SUFFIX,leschamanes.com
-  - IP-CIDR,172.232.25.131/32
   - DOMAIN-SUFFIX,obsproject.com
   - DOMAIN-SUFFIX,lowendtalk.com
   - DOMAIN-SUFFIX,goaccess.io
@@ -132,8 +126,8 @@ payload:
   - DOMAIN-SUFFIX,2328.io
   - DOMAIN-SUFFIX,cloudblast.io
   - DOMAIN-SUFFIX,waicore.com
-  - PROCESS-NAME,ytdlp-interface.exe
   - DOMAIN-SUFFIX,hotio.dev
   - DOMAIN-SUFFIX,fastly.net
   - DOMAIN-SUFFIX,resend.com
   - DOMAIN-SUFFIX,mumuplayer.com
+  - DOMAIN-SUFFIX,wakemeops.com
