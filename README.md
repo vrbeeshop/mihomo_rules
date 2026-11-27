@@ -45,3 +45,33 @@ python3 -m venv .work/venv
 
 Файлы записываются в `dist/`. `manifest.json` содержит источники, хеши и число
 правил; `checksums.sha256` — контрольные суммы файлов релиза.
+
+## Часовое обновление зеркала
+
+Нода сама забирает клиентские файлы из GitHub Releases по HTTPS.
+Состав задаётся списком `mirror` в `rulesets.yaml`. Сборщик записывает
+имена файлов в `manifest.json`. Служба сверяет локальные файлы с SHA256
+одного релиза, скачивает изменившиеся во временный каталог и проверяет
+их перед заменой. Такой запуск также восстанавливает пропущенные файлы.
+
+На ноде понадобятся Python 3, systemd и локальный пользователь
+`rules-publisher` с правом записи в каталог сайта. В командах ниже
+укажите каталог на хосте, который читает веб-сервер. Выполняйте их
+из корня копии этого репозитория на ноде.
+
+```bash
+sudo install -D -m 0644 scripts/sync_mirror.py /usr/local/lib/mihomo-rules/sync_mirror.py
+sudo install -m 0644 deploy/mihomo-rules-mirror.{service,timer} /etc/systemd/system/
+printf '%s\n' 'MIRROR_DIR=/srv/www/rules' | sudo tee /etc/default/mihomo-rules-mirror >/dev/null
+sudo systemctl daemon-reload
+sudo systemctl start mihomo-rules-mirror.service && sudo systemctl enable --now mihomo-rules-mirror.timer
+```
+
+Первый запуск обновляет файлы сразу. Затем таймер срабатывает каждый час
+в `:30` по времени ноды. При пропущенном запуске он сработает после включения.
+Проверка расписания и результата последнего запуска:
+
+```bash
+systemctl list-timers --all mihomo-rules-mirror.timer
+journalctl -u mihomo-rules-mirror.service -n 15 --no-pager
+```

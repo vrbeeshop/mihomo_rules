@@ -93,6 +93,12 @@ def load_manifest(path: Path) -> dict:
             target = group["behavior"]
             if target not in (behavior, "classical") and (behavior, target) != ("classical", "domain"):
                 raise BuildError(f"Incompatible behaviors for {name}: {source_id}")
+    if "mirror" in data:
+        names = data["mirror"]
+        if (not isinstance(names, list) or not names
+                or any(not isinstance(name, str) or name not in data["rulesets"] for name in names)
+                or len(set(names)) != len(names)):
+            raise BuildError("mirror must be a nonempty list of distinct ruleset names")
     ruleset_order(data["rulesets"])
     return data
 
@@ -555,6 +561,8 @@ def build(manifest: dict, binary: Path, output: Path, work: Path, offline: bool 
         result["validation_geodata"] = validate_providers(
             binary, stage, manifest["rulesets"], temporary, work / "geodata", offline=offline)
         (stage / "providers.yaml").write_text(yaml.safe_dump({"rule-providers": providers}, sort_keys=False), encoding="utf-8")
+        if "mirror" in manifest:
+            result["mirror_files"] = [Path(providers[name]["path"]).name for name in manifest["mirror"]]
         (stage / "manifest.json").write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         notes = ["Daily Mihomo rules", "", "MRS, YAML and LIST built from public upstream and repository sources.",
                  "See manifest.json for source hashes, counts and build details.", "",

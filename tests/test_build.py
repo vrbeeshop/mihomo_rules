@@ -433,7 +433,9 @@ class NativeBuildTests(unittest.TestCase):
         )
 
     def test_full_build_removes_duplicates_and_exports_matching_formats(self):
+        self.manifest["mirror"] = ["networks", "other"]
         result = self.build()
+        self.assertEqual(result["mirror_files"], ["networks.mrs", "other.yaml"])
         expected = ["*.wild.example", "+.suffix.example", ".subdomains.example", "additional.example", "exact.example"]
         self.assertEqual(builder.read_rules(self.output / "combined.list", "text"), expected)
         self.assertEqual(builder.read_rules(self.output / "combined.yaml", "yaml"), expected)

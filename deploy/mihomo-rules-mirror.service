@@ -1,0 +1,15 @@
+[Unit]
+Description=Sync published Mihomo rules to the web server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=rules-publisher
+EnvironmentFile=/etc/default/mihomo-rules-mirror
+ExecStart=/usr/bin/python3 /usr/local/lib/mihomo-rules/sync_mirror.py ${MIRROR_DIR}
+TimeoutStartSec=10min
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=yes

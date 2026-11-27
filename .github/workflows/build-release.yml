@@ -87,7 +87,6 @@ jobs:
           cd dist
           sha256sum --check --strict checksums.sha256
       - name: Publish complete release
-        id: release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -133,21 +132,3 @@ jobs:
           # Any failure above leaves a draft and preserves the previous public release.
           gh release edit "$release_tag" --draft=false --latest
           gh release view "$release_tag" --json url --jq .url >> "$GITHUB_STEP_SUMMARY"
-          echo 'published=true' >> "$GITHUB_OUTPUT"
-      # Keep both destinations under the same lock and skip stale releases on both.
-      - name: Check out mirror publisher
-        if: steps.release.outputs.published == 'true' && vars.MIRROR_DIR != ''
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-          path: publisher
-      - name: Upload client rules via SFTP
-        if: steps.release.outputs.published == 'true' && vars.MIRROR_DIR != ''
-        env:
-          MIRROR_DIR: ${{ vars.MIRROR_DIR }}
-          MIRROR_PORT: ${{ vars.MIRROR_PORT || '22' }}
-          MIRROR_USER: ${{ vars.MIRROR_USER || 'rules-publisher' }}
-          MIRROR_HOST: ${{ secrets.MIRROR_HOST }}
-          MIRROR_HOST_KEY: ${{ secrets.MIRROR_HOST_KEY }}
-          MIRROR_PRIVATE_KEY: ${{ secrets.MIRROR_PRIVATE_KEY }}
-        run: python3 publisher/scripts/publish_mirror.py

@@ -1,6 +1,42 @@
 version: 1
 repository: vrbeeshop/mihomo_rules
 allow_global_geodata: false
+mirror:
+  - asn-16276
+  - asn-16509
+  - cdn-domains
+  - cloudflare-ips
+  - cloudfront-ips
+  - discord_domains
+  - discord_voiceips
+  - games-direct
+  - games-domains
+  - geoip-private
+  - geosite-adguard
+  - geosite-autodesk
+  - geosite-linkedin
+  - geosite-private
+  - geosite-spotify
+  - geosite-tmdb
+  - geosite-whatsapp
+  - geosite-x
+  - messenger-domains
+  - oisd_big
+  - panel-proxy
+  - ru-apps
+  - soundcloud
+  - telegram-domains
+  - telegram-ips
+  - torrent-clients
+  - torrent-trackers
+  - vrbee_proxy
+  - vrbee_proxy_ips
+  - vrbee_proxy_keywords
+  - vrbee_ru
+  - vrbee_ru_ips
+  - vrbee_ru_keywords
+  - whatsapp-ips
+  - youtube
 sources:
   ai:
     behavior: domain
